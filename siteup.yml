@@ -1,0 +1,26 @@
+---
+- name: Check if website is accessible
+  hosts: localhost
+  gather_facts: false
+  vars:
+    website_url: "https://example.com"  # 🔁 Replace with your target URL
+
+  tasks:
+    - name: Check website status with URI module
+      uri:
+        url: "{{ website_url }}"
+        method: GET
+        status_code: 200  # Expected status
+        return_content: no
+      register: website_check
+
+    - name: Print website response info
+      debug:
+        msg: >
+          Website {{ website_url }} is reachable
+          with status: {{ website_check.status }}.
+
+    - name: Fail if website is not accessible
+      fail:
+        msg: "Website {{ website_url }} is not accessible or did not return HTTP 200."
+      when: website_check.status != 200
