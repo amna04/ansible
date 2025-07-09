@@ -1,0 +1,23 @@
+---
+- name: Verify if a URL is up
+  hosts: localhost
+  gather_facts: no
+  vars:
+    target_url: "https://example.com"  # Default, can be overridden in AWX
+    expected_status: 200
+
+  tasks:
+    - name: Check if {{ target_url }} is reachable
+      uri:
+        url: "{{ target_url }}"
+        method: GET
+        return_content: no
+        status_code: "{{ expected_status }}"
+        timeout: 10
+        validate_certs: yes
+      register: url_check
+      failed_when: url_check.status != expected_status
+
+    - name: Report success
+      debug:
+        msg: "✅ URL {{ target_url }} is up and returned status {{ url_check.status }}"
